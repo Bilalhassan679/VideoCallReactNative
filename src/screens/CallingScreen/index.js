@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import CallingActionBox from '../../components/CallingActionBox';
+import LocalVideoContainer from '../../components/LocalVideoContainer';
 import useCallingScreen from './useCallingScreen';
 
 import {Voximplant} from 'react-native-voximplant';
@@ -33,11 +34,11 @@ const CallingScreen = ({route, navigation}) => {
             style={styles.remoteVideo}
           />
 
-          <Voximplant.VideoView
+          {/* <Voximplant.VideoView
             // videoStreamId={localVideoStreamId}
             style={styles.localVideo}
-          />
-
+          /> */}
+          <LocalVideoContainer videoStreamId={localVideoStreamId} />
           <View style={styles.flexDirection}>
             <View style={styles.topContainer}>
               <Text style={styles.title}>{user?.user_display_name}</Text>
@@ -57,12 +58,12 @@ export default CallingScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'brown',
+    // backgroundColor: 'brown',
   },
   topContainer: {
     alignItems: 'center',
   },
-  innerContainer: {flexDirection: 'row', flex: 1, marginTop: 30, padding: 10},
+  innerContainer: {flexDirection: 'row', flex: 1, padding: 10},
   title: {
     color: 'white',
     fontSize: 25,
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    bottom: 100,
+    bottom: 150,
     zIndex: -1,
   },
   flexDirection: {

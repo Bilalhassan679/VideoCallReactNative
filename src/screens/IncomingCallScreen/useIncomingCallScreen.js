@@ -12,7 +12,7 @@ const useIncomingCallScreen = ({navigate}, {params}) => {
       navigate('ContactScreen');
     });
     return () => call.off(Voximplant.CallEvents.Disconnected);
-  }, []);
+  }, [call]);
 
   const Decline = () => {
     call.decline();
