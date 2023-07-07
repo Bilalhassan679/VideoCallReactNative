@@ -23,8 +23,8 @@ const ContactScreen = ({navigation}) => {
   }, [changeText]);
 
   //navigate CallUser
-  const callUsers = item => {
-    navigation.navigate('CallingScreen', item);
+  const callUsers = user => {
+    navigation.navigate('CallingScreen', {user});
   };
 
   return (

@@ -19,7 +19,7 @@ const useIncomingCallScreen = ({navigate}, {params}) => {
   };
   const onAccept = () => {
     navigate('CallingScreen', {
-      call,
+      call: call,
       isIncomingCall: true,
     });
   };

@@ -8,8 +8,15 @@ import useCallingScreen from './useCallingScreen';
 import {Voximplant} from 'react-native-voximplant';
 
 const CallingScreen = ({route, navigation}) => {
-  const {user_display_name, callStatus, hangOnPress, localVideoStreamId} =
-    useCallingScreen(navigation, route);
+  const {
+    user_display_name,
+    callStatus,
+    hangOnPress,
+    user,
+    localVideoStreamId,
+    remoteVideoStreamId,
+    onHangupPress,
+  } = useCallingScreen(navigation, route);
   return (
     <>
       <View style={styles.container}>
@@ -20,19 +27,26 @@ const CallingScreen = ({route, navigation}) => {
             size={30}
             color={'white'}
           />
+
           <Voximplant.VideoView
-            style={styles.reciever}
-            videoStreamId={localVideoStreamId}
+            videoStreamId={remoteVideoStreamId}
+            style={styles.remoteVideo}
           />
+
+          <Voximplant.VideoView
+            // videoStreamId={localVideoStreamId}
+            style={styles.localVideo}
+          />
+
           <View style={styles.flexDirection}>
             <View style={styles.topContainer}>
-              <Text style={styles.title}>{user_display_name}</Text>
+              <Text style={styles.title}>{user?.user_display_name}</Text>
               <Text style={styles.phone}>{callStatus}</Text>
             </View>
             <View></View>
           </View>
         </View>
-        <CallingActionBox hangOnPress={hangOnPress} />
+        <CallingActionBox hangOnPress={onHangupPress} />
       </View>
     </>
   );
@@ -59,13 +73,26 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  reciever: {
-    backgroundColor: 'yellow',
-    borderRadius: 10,
-    height: 150,
+  localVideo: {
     width: 100,
-    // right: 10,
-    // top: 20,
+    height: 150,
+    backgroundColor: '#ffff6e',
+
+    borderRadius: 10,
+    position: 'absolute',
+    right: 10,
+    top: 100,
+    zIndex: 99999,
+  },
+  remoteVideo: {
+    backgroundColor: '#7b4e80',
+    borderRadius: 10,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 100,
+    zIndex: -1,
   },
   flexDirection: {
     flexDirection: 'row',

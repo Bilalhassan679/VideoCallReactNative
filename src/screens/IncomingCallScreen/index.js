@@ -11,7 +11,6 @@ const IncomingCallScreen = ({navigation, route}) => {
     navigation,
     route,
   );
-  const item = route.params;
   return (
     <>
       <ImageBackground source={bg} style={styles.container}>

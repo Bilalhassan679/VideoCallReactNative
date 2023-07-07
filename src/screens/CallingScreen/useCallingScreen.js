@@ -14,21 +14,19 @@ const permissions = [
   PermissionsAndroid.PERMISSIONS.CAMERA,
 ];
 const useCallingScreen = ({navigate}, {params}) => {
+  const [permissionGranted, setPermissionGranted] = useState(false);
+  const [callStatus, setCallStatus] = useState('Intializing...');
   const [localVideoStreamId, setLocalVideoStreamId] = useState('');
   const [remoteVideoStreamId, setRemoteVideoStreamId] = useState('');
 
   const voximplant = Voximplant.getInstance();
 
-  const [permissionGranted, setPermissionGranted] = useState(false);
-  const [callStatus, setCallStatus] = useState('Intializing...');
-  const call = useRef();
-  const {
-    user_name,
-    user_display_name,
-    call: incomingCall,
-    isIncomingCall,
-  } = params;
+  const {user, call: incomingCall, isIncomingCall} = params;
 
+  console.log(user, incomingCall, isIncomingCall, 'esfdasdeeeeee');
+
+  const call = useRef(incomingCall);
+  const endpoint = useRef(null);
   const requestPermissions = async () => {
     const granted = await PermissionsAndroid.requestMultiple(permissions);
     const recordAudioGranted =
@@ -41,6 +39,7 @@ const useCallingScreen = ({navigate}, {params}) => {
       setPermissionGranted(true);
     }
   };
+
   useEffect(() => {
     if (Platform.OS == 'android') {
       requestPermissions();
@@ -62,14 +61,16 @@ const useCallingScreen = ({navigate}, {params}) => {
       },
     };
     const makeCall = async () => {
-      call.current = await voximplant.call(user_name, callSetting);
+      call.current = await voximplant.call(user?.user_name, callSetting);
       //   console.log(call, 'sakdl');
       subscribeToCallEvent();
     };
 
-    const answerCall = () => {
+    const answerCall = async () => {
       subscribeToCallEvent();
-      call.current.answerCall(callSetting);
+      endpoint.current = call.current.getEndpoints()[0];
+      subscribeToEndpointEvent();
+      call.current.answer(callSetting);
     };
 
     //CALL FAILED IF UNAVAILABLE OR NO AVAILABLE IN DATABASE
@@ -86,11 +87,12 @@ const useCallingScreen = ({navigate}, {params}) => {
       call.current.on(Voximplant.CallEvents.Connected, callEvent => {
         setCallStatus('Connected...');
       });
+
       //RINGING CAll
       call.current.on(Voximplant.CallEvents.Disconnected, callEvent => {
         navigate('ContactScreen');
       });
-      //OVER SCREEn
+      //OVER SCREEN
 
       call.current.on(
         Voximplant.CallEvents.LocalVideoStreamAdded,
@@ -98,8 +100,21 @@ const useCallingScreen = ({navigate}, {params}) => {
           setLocalVideoStreamId(callEvent.videoStream.id);
         },
       );
+
+      call.current.on(Voximplant.CallEvents.EndpointAdded, callEvent => {
+        endpoint.current = callEvent.endpoint;
+        subscribeToEndpointEvent();
+      });
     };
 
+    const subscribeToEndpointEvent = async () => {
+      endpoint.current.on(
+        Voximplant.EndpointEvents.RemoteVideoStreamAdded,
+        endpointEvent => {
+          setRemoteVideoStreamId(endpointEvent.videoStream.id);
+        },
+      );
+    };
     const showCallError = reason => {
       Alert.alert('Call Failed', `Reason : ${reason}`, [
         {text: 'OK', onPress: () => navigate('ContactScreen')},
@@ -120,13 +135,19 @@ const useCallingScreen = ({navigate}, {params}) => {
       call.current.off(Voximplant.CallEvents.Disconnected);
     };
   }, [permissionGranted]);
+
   // MAke CALL END
 
-  const hangOnPress = () => {
-    console.log('sadjl');
+  const onHangupPress = () => {
     call.current.hangup();
   };
-  return {user_display_name, callStatus, hangOnPress, localVideoStreamId};
+  return {
+    user,
+    callStatus,
+    localVideoStreamId,
+    remoteVideoStreamId,
+    onHangupPress,
+  };
 };
 
 export default useCallingScreen;
