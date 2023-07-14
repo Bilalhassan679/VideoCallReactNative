@@ -44,7 +44,6 @@ const CallingScreen = ({route, navigation}) => {
               <Text style={styles.title}>{user?.user_display_name}</Text>
               <Text style={styles.phone}>{callStatus}</Text>
             </View>
-            <View></View>
           </View>
         </View>
         <CallingActionBox hangOnPress={onHangupPress} />
